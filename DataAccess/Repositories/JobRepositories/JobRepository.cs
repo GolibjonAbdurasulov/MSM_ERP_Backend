@@ -7,7 +7,7 @@ namespace DataAccess.Repositories.JobRepositories;
 [Injectable]
 public class JobRepository : RepositoryBase<Job,long>, IJobRepository
 {
-    protected JobRepository(AppDbContext dbContext) : base(dbContext)
+    public JobRepository(AppDbContext dbContext) : base(dbContext)
     {
     }
 }

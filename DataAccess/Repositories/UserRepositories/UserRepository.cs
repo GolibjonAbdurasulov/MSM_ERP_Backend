@@ -7,7 +7,7 @@ namespace DataAccess.Repositories.UserRepositories;
 [Injectable]
 public class UserRepository : RepositoryBase<User, long>, IUserRepository
 {
-    protected UserRepository(AppDbContext dbContext) : base(dbContext)
+    public UserRepository(AppDbContext dbContext) : base(dbContext)
     {
     }
 }

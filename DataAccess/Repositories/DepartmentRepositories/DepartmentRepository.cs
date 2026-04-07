@@ -7,7 +7,7 @@ namespace DataAccess.Repositories.DepartmentRepositories;
 [Injectable]
 public class DepartmentRepository : RepositoryBase<Department,long>, IDepartmentRepository
 {
-    protected DepartmentRepository(AppDbContext dbContext) : base(dbContext)
+    public DepartmentRepository(AppDbContext dbContext) : base(dbContext)
     {
     }
 }

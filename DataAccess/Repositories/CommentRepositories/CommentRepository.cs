@@ -7,7 +7,7 @@ namespace DataAccess.Repositories.CommentRepositories;
 [Injectable]
 public class CommentRepository : RepositoryBase<Comment,long>, ICommentRepository
 {
-    protected CommentRepository(AppDbContext dbContext) : base(dbContext)
+    public CommentRepository(AppDbContext dbContext) : base(dbContext)
     {
     }
 }

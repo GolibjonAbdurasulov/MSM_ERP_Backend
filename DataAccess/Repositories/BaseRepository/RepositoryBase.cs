@@ -13,7 +13,7 @@ public class RepositoryBase<T, TId> : IRepositoryBase<T, TId>, IQueryable<T>, IA
     // ReSharper disable once MemberCanBePrivate.Global
     public readonly AppDbContext _dbContext;
 
-    protected RepositoryBase(AppDbContext dbContext)
+    public RepositoryBase(AppDbContext dbContext)
     {
         _dbContext = dbContext;
     }
