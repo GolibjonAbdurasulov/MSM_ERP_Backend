@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Services.Interfaces;
 using Services.ViewModels.JobViewModels;
@@ -17,6 +18,7 @@ public class JobController : ControllerBase
     }
     
     [HttpPost]
+    [Authorize]
     public async Task<ResponseModelBase> CreateJob(JobCreationViewModel model)
     {
         var job=await _jobService.CreateJob(model);
@@ -24,6 +26,7 @@ public class JobController : ControllerBase
     }
     
     [HttpPut]
+    [Authorize]
     public async Task<ResponseModelBase> UpdateJob(JobUpdateViewModel model)
     {
         var job=await _jobService.UpdateJob(model);
@@ -31,6 +34,7 @@ public class JobController : ControllerBase
     }
     
     [HttpDelete]
+    [Authorize]
     public async Task<ResponseModelBase> DeleteJob(long id)
     {
         var res=await _jobService.DeleteJob(id);
@@ -38,6 +42,7 @@ public class JobController : ControllerBase
     }
     
     [HttpGet]
+    [Authorize]
     public async Task<ResponseModelBase> GetJobById(long id)
     {
         var res=await _jobService.GetJobById(id);
@@ -45,6 +50,7 @@ public class JobController : ControllerBase
     }
     
     [HttpGet]
+    [Authorize]
     public async Task<ResponseModelBase> GetAllJobs()
     {
         var res=await _jobService.GetAllJobs();
@@ -52,9 +58,18 @@ public class JobController : ControllerBase
     }
     
     [HttpGet]
-    public async Task<ResponseModelBase> GetAllJobsByDepartmentId(long departmentId)
+    [Authorize]
+    public async Task<ResponseModelBase> GetAllJobsByDepartmentId(long departmentId,DateTime time)
     {
-        var jobs =await _jobService.GetJobsByDepartmentId(departmentId);
+        var jobs =await _jobService.GetJobsByDepartmentId(departmentId,time);
         return (jobs,200);
+    }
+
+    [HttpGet]
+    [Authorize]
+    public async Task<ResponseModelBase> GetDepartmentActiveJobsCount(long departmentId,DateTime time)
+    {
+        var res=await _jobService.GetDepartmentActiveJobsCount(departmentId,time);
+        return (res,200);
     }
 }

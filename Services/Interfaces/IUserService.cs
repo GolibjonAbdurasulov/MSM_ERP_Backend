@@ -11,4 +11,8 @@ public interface IUserService
     public Task<List<UserGetViewModel>> GetAllUsers();
     public Task<UserGetViewModel> GetUserById(long id);
     public Task<List<UserGetViewModel>> GetAllUsersByDepartmentId(long departmentId);
+    public Task<bool> UserExists(string email);
+    public Task<bool> CheckPasswordAsync(UserWithPasswordViewModel user, string password);
+    public Task<UserWithPasswordViewModel> GetUserByEmail(string email);
+    public Task<UserGetViewModel> LogOutUser(long id);
 }

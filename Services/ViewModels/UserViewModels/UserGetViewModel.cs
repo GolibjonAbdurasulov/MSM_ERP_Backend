@@ -5,9 +5,11 @@ namespace Services.ViewModels.UserViewModels;
 public class UserGetViewModel
 {
     public long Id { get; set; }
-    public string FullName { get; set; } 
+    public string FirstName { get; set; } 
+    public string LastName { get; set; } 
     public string Email { get; set; }
-    public string Password { get; set; }
     public UserRole Role { get; set; }
     public long DepartmentId { get; set; }
+    public DateTime LastLoginDate { get; set; }
+    public bool IsSigned { get; set; }
 }

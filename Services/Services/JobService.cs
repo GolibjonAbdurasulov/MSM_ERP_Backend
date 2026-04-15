@@ -1,18 +1,23 @@
+using Core.Attributes;
+using Core.Hubs;
 using DataAccess.Entities;
 using DataAccess.Exeptions;
 using DataAccess.Repositories.JobRepositories;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 using Services.Interfaces;
 using Services.ViewModels.JobViewModels;
 
 namespace Services.Services;
-
+[Injectable]
 public class JobService : IJobService
 {
     private readonly IJobRepository _jobRepository;
-
-    public JobService(IJobRepository jobRepository)
+    private readonly IHubContext<JobHub> _hubContext;   
+    public JobService(IJobRepository jobRepository, IHubContext<JobHub> hubContext)
     {
         _jobRepository = jobRepository;
+        _hubContext = hubContext;
     }
 
     public async Task<JobGetViewModel> CreateJob(JobCreationViewModel model)
@@ -24,13 +29,21 @@ public class JobService : IJobService
             JobStatus = model.JobStatus,
             PublisherId = model.PublisherId,
             DepartmentId = model.DepartmentId,
-            PublishedDate = model.PublishedDate,
+            PublishedDate = DateTime.Now,
             StartedDate = model.StartedDate,
             EndDate = model.EndDate,
         };
 
         var createdJob = await _jobRepository.AddAsync(job);
-
+        
+        await _hubContext.Clients.All.SendAsync(
+            "JobChanged",
+            new
+            {
+                DepartmentId = job.DepartmentId,
+                Date = job.PublishedDate.Date.ToString("yyyy-MM-dd")
+            }
+        );
         var jobGetViewModel = new JobGetViewModel()
         {
             Id = createdJob.Id,
@@ -57,6 +70,14 @@ public class JobService : IJobService
         job.EndDate=model.EndDate;
         
         var updatedJob=await _jobRepository.UpdateAsync(job);
+        await _hubContext.Clients.All.SendAsync(
+            "JobChanged",
+            new
+            {
+                DepartmentId = job.DepartmentId,
+                Date = job.PublishedDate.Date.ToString("yyyy-MM-dd")
+            }
+        );
         var jobGetViewModel = new JobGetViewModel()
         {
             Id = updatedJob.Id,
@@ -79,7 +100,15 @@ public class JobService : IJobService
         if (job == null)
             throw new NotFoundException("job not found on JobService");
 
-        _jobRepository.RemoveAsync(job);
+        await _jobRepository.RemoveAsync(job);
+        await _hubContext.Clients.All.SendAsync(
+            "JobDeleted",
+            new
+            {
+                DepartmentId = job.DepartmentId,
+                Date = job.PublishedDate.Date.ToString("yyyy-MM-dd")
+            }
+        );
         return true;
     }
 
@@ -98,14 +127,19 @@ public class JobService : IJobService
            DepartmentId = job.DepartmentId,
            PublishedDate = job.PublishedDate,
            StartedDate = job.StartedDate,
-           EndDate = job.EndDate
+           EndDate = job.EndDate,
+           DepartmentName = job.Department.DepartmentFullName,
+           PublisherName = job.Publisher.FirstName + " " + job.Publisher.LastName,
        };
        return jobGetViewModel;
     }
 
-    public async Task<List<JobGetViewModel>> GetJobsByDepartmentId(long departmentId)
+    public async Task<List<JobGetViewModel>> GetJobsByDepartmentId(long departmentId,DateTime time)
     {
-        var jobs=_jobRepository.GetAllAsQueryable().Where(j=>j.DepartmentId==departmentId).ToList();
+        var jobs=await _jobRepository.GetAllAsQueryable().
+        Where(j => j.DepartmentId == departmentId && 
+                j.StartedDate.Date<=time.Date && j.EndDate.Date>=time.Date)
+            .ToListAsync();
         var jobGetViewModels=new List<JobGetViewModel>();
         
         foreach (Job job in jobs)
@@ -120,12 +154,23 @@ public class JobService : IJobService
                 DepartmentId = job.DepartmentId,
                 PublishedDate = job.PublishedDate,
                 StartedDate = job.StartedDate,
-                EndDate = job.EndDate
+                EndDate = job.EndDate,
+                DepartmentName = job.Department.DepartmentFullName,
+                PublisherName = job.Publisher.FirstName + " " + job.Publisher.LastName,
             });
         }
         return jobGetViewModels;
     }
 
+    public async Task<int> GetDepartmentActiveJobsCount(long departmentId,DateTime time)
+    {
+        var jobs=await _jobRepository.GetAllAsQueryable().
+            Where(j => j.DepartmentId == departmentId && 
+                       j.StartedDate.Date<=time.Date && j.EndDate.Date>=time.Date)
+            .ToListAsync();
+        return jobs.Count;
+    }    
+    
     public async Task<List<JobGetViewModel>> GetAllJobs()
     {
         var jobs=_jobRepository.GetAllAsQueryable().ToList();
@@ -143,7 +188,9 @@ public class JobService : IJobService
                 DepartmentId = job.DepartmentId,
                 PublishedDate = job.PublishedDate,
                 StartedDate = job.StartedDate,
-                EndDate = job.EndDate
+                EndDate = job.EndDate,
+                DepartmentName = job.Department.DepartmentFullName,
+                PublisherName = job.Publisher.FirstName + " " + job.Publisher.LastName,
             });
         }
         return jobGetViewModels;

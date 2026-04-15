@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Services.Interfaces;
 using Services.ViewModels.UserViewModels;
@@ -17,6 +18,7 @@ public class UserController : Controller
     }
     
     [HttpPost]
+    [Authorize]
     public async Task<ResponseModelBase> CreateUser(UserCreationViewModel model)
     {
         var user=await _userService.CreateUser(model);
@@ -24,6 +26,7 @@ public class UserController : Controller
     }
     
     [HttpPut]
+    [Authorize]
     public async Task<ResponseModelBase> UpdateUser(UserUpdateViewModel model)
     {
         var user=await _userService.UpdateUser(model);
@@ -31,6 +34,7 @@ public class UserController : Controller
     }
     
     [HttpDelete]
+    [Authorize]
     public async Task<ResponseModelBase> DeleteUser(long id)
     {
         var res=await _userService.DeleteUser(id);
@@ -39,6 +43,7 @@ public class UserController : Controller
     
     
     [HttpGet]
+    [Authorize]
     public async Task<ResponseModelBase> GetUserById(long id)
     {
         var user=await _userService.GetUserById(id);
@@ -47,6 +52,7 @@ public class UserController : Controller
     
     
     [HttpGet]
+    [Authorize]
     public async Task<ResponseModelBase> GetUsersByDepartmentId(long departmentId)
     {
         var users=await _userService.GetAllUsersByDepartmentId(departmentId);
@@ -55,6 +61,7 @@ public class UserController : Controller
     }
     
     [HttpGet]
+    [Authorize]
     public async Task<ResponseModelBase> GetAllUsers()
     {
         var users=await _userService.GetAllUsers();

@@ -9,7 +9,6 @@ public class JobCreationViewModel
     public JobStatus JobStatus { get; set; }
     public long PublisherId { get; set; }
     public long DepartmentId { get; set; }
-    public DateTime PublishedDate { get; set; }
     public DateTime StartedDate { get; set; }
     public DateTime EndDate { get; set; }
 }

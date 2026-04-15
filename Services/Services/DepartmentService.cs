@@ -1,10 +1,11 @@
+using Core.Attributes;
 using DataAccess.Entities;
 using DataAccess.Repositories.DepartmentRepositories;
 using Services.Interfaces;
 using Services.ViewModels.DepartmentViewModels;
 
 namespace Services.Services;
-
+[Injectable]
 public class DepartmentService : IDepartmentService
 {
     private readonly IDepartmentRepository _departmentRepository;

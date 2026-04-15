@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Services.Interfaces;
 using Services.ViewModels.CommentViewModels;
@@ -17,6 +18,7 @@ public class CommentController : ControllerBase
     }
     
     [HttpPost]
+    [Authorize]
     public async Task<ResponseModelBase> CreateComment(CommentCreationViewModel model)
     {
         var user=await _commentService.CreateCommit(model);
@@ -24,6 +26,7 @@ public class CommentController : ControllerBase
     }
     
     [HttpPut]
+    [Authorize]
     public async Task<ResponseModelBase> UpdateComment(CommentUpdateViewModel model)
     {
         var user=await _commentService.UpdateComment(model);
@@ -31,6 +34,7 @@ public class CommentController : ControllerBase
     }
     
     [HttpDelete]
+    [Authorize]
     public async Task<ResponseModelBase> DeleteComment(long id)
     {
         var res=await _commentService.DeleteComment(id);
@@ -39,6 +43,7 @@ public class CommentController : ControllerBase
     
     
     [HttpGet]
+    [Authorize]
     public async Task<ResponseModelBase> GetCommentById(long id)
     {
         var user=await _commentService.GetCommentById(id);
@@ -47,6 +52,7 @@ public class CommentController : ControllerBase
     
     
     [HttpGet]
+    [Authorize]
     public async Task<ResponseModelBase> GetCommentByJobId(long jobId)
     {
         var users=await _commentService.GetCommentsByJobId(jobId);
@@ -55,6 +61,7 @@ public class CommentController : ControllerBase
     }
     
     [HttpGet]
+    [Authorize]
     public async Task<ResponseModelBase> GetCommentByPublisherId(long publisherId)
     {
         var users=await _commentService.GetCommentsByPublisherId(publisherId);
@@ -63,6 +70,7 @@ public class CommentController : ControllerBase
     }
     
     [HttpGet]
+    [Authorize]
     public async Task<ResponseModelBase> GetAllComments()
     {
         var users=await _commentService.GetAllComments();

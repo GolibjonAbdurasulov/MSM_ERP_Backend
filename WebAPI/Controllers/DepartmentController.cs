@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Services.Interfaces;
 using Services.ViewModels.DepartmentViewModels;
@@ -16,6 +17,7 @@ public class DepartmentController : ControllerBase
     }
     
     [HttpPost]
+    [Authorize]
     public async Task<ResponseModelBase> CreateDepartment(DepartmentCreationViewModel model)
     {
         var department=await _departmentService.CreateDepartment(model);
@@ -24,6 +26,7 @@ public class DepartmentController : ControllerBase
     
     
     [HttpPut]
+    [Authorize]
     public async Task<ResponseModelBase> UpdateDepartment(DepartmentUpdateViewModel model)
     {
         var department=await _departmentService.UpdateDepartment(model);
@@ -31,6 +34,7 @@ public class DepartmentController : ControllerBase
     }
     
     [HttpDelete]
+    [Authorize]
     public async Task<ResponseModelBase> DeleteDepartment(long id)
     {
         var res=await _departmentService.DeleteDepartment(id);
@@ -45,6 +49,7 @@ public class DepartmentController : ControllerBase
     }
     
     [HttpGet]
+    [Authorize]
     public async Task<ResponseModelBase> GetDepartmentById(long id)
     {
         var department=await _departmentService.GetDepartmentById(id);

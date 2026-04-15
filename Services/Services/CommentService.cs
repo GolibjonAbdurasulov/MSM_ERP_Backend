@@ -1,3 +1,4 @@
+using Core.Attributes;
 using DataAccess.Entities;
 using DataAccess.Exeptions;
 using DataAccess.Repositories.CommentRepositories;
@@ -5,7 +6,7 @@ using Services.Interfaces;
 using Services.ViewModels.CommentViewModels;
 
 namespace Services.Services;
-
+[Injectable]
 public class CommentService : ICommentService
 {
     private  ICommentRepository _commentRepository;
