@@ -22,6 +22,9 @@ public class Job : BaseEntity<long>
     [Column("publisher_id"), ForeignKey(nameof(Publisher))]
     public long PublisherId { get; set; }
     public virtual User Publisher { get; set; }
+
+    [Column("mobilized_workers")]
+    public int MobilizedWorkers { get; set; }
     
     [Required] 
     [Column("department_id"), ForeignKey(nameof(Department))]

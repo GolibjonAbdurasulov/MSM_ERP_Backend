@@ -28,6 +28,7 @@ public class JobService : IJobService
             Description = model.Description,
             JobStatus = model.JobStatus,
             PublisherId = model.PublisherId,
+            MobilizedWorkers = model.MobilizedWorkers,
             DepartmentId = model.DepartmentId,
             PublishedDate = DateTime.Now,
             StartedDate = model.StartedDate,
@@ -51,6 +52,7 @@ public class JobService : IJobService
             Description = createdJob.Description,
             JobStatus = createdJob.JobStatus,
             PublisherId = createdJob.PublisherId,
+            MobilizedWorkers = createdJob.MobilizedWorkers,
             DepartmentId = createdJob.DepartmentId,
             PublishedDate = createdJob.PublishedDate,
             StartedDate = createdJob.StartedDate,
@@ -68,6 +70,7 @@ public class JobService : IJobService
         job.DepartmentId = model.DepartmentId;
         job.StartedDate=model.StartedDate;
         job.EndDate=model.EndDate;
+        job.MobilizedWorkers=model.MobilizedWorkers;
         
         var updatedJob=await _jobRepository.UpdateAsync(job);
         await _hubContext.Clients.All.SendAsync(
@@ -89,6 +92,7 @@ public class JobService : IJobService
             PublishedDate = updatedJob.PublishedDate,
             StartedDate = updatedJob.StartedDate,
             EndDate = updatedJob.EndDate,
+            MobilizedWorkers = updatedJob.MobilizedWorkers,
         };
         
         return jobGetViewModel;
@@ -125,6 +129,7 @@ public class JobService : IJobService
            JobStatus = job.JobStatus,
            PublisherId = job.PublisherId,
            DepartmentId = job.DepartmentId,
+           MobilizedWorkers = job.MobilizedWorkers,
            PublishedDate = job.PublishedDate,
            StartedDate = job.StartedDate,
            EndDate = job.EndDate,
@@ -152,6 +157,7 @@ public class JobService : IJobService
                 JobStatus = job.JobStatus,
                 PublisherId = job.PublisherId,
                 DepartmentId = job.DepartmentId,
+                MobilizedWorkers = job.MobilizedWorkers,
                 PublishedDate = job.PublishedDate,
                 StartedDate = job.StartedDate,
                 EndDate = job.EndDate,
@@ -185,6 +191,7 @@ public class JobService : IJobService
                 Description = job.Description,
                 JobStatus = job.JobStatus,
                 PublisherId = job.PublisherId,
+                MobilizedWorkers = job.MobilizedWorkers,
                 DepartmentId = job.DepartmentId,
                 PublishedDate = job.PublishedDate,
                 StartedDate = job.StartedDate,

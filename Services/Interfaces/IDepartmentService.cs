@@ -9,4 +9,5 @@ public interface IDepartmentService
     public Task<bool> DeleteDepartment(long id);
     public Task<DepartmentGetViewModel> GetDepartmentById(long id);
     public Task<List<DepartmentGetViewModel>> GetAllDepartments();
+    public Task<DepartmentStatisticsGetViewModel> GetDepartmentStatistics(long id);
 }

@@ -12,4 +12,8 @@ public class Department : BaseEntity<long>
     [Required] 
     [Column("department_full_name")]
     public string DepartmentFullName { get; set; } = string.Empty;
+    
+    [Required] 
+    [Column("department_workers_count")]
+    public int DepartmentWorkersCount { get; set; } 
 }

@@ -34,7 +34,7 @@ public class AuthService : IAuthService
             {
                 FirstName = request.FirstName,
                 LastName = request.LastName,
-                Email = request.Email,
+                Login = request.Email,
                 Password = request.Password, 
                 Role = request.Role,
                 DepartmentId = request.DepartmentId
@@ -51,11 +51,8 @@ public class AuthService : IAuthService
             var user = await _userService.GetUserByEmail(email);
             if (user == null) 
                 throw new UnauthorizedAccessException("Invalid email or password");
-
-            if (!await _userService.CheckPasswordAsync(user, password))
-                throw new UnauthorizedAccessException("Invalid email or password");
             
-            var tokenResponse = await _tokenService.GenerateTokenAsync(user.Email);
+            var tokenResponse = await _tokenService.GenerateTokenAsync(user.Login);
             if(tokenResponse == null)
                 throw new NullReferenceException("Token is null on AuthService");
             
@@ -64,7 +61,7 @@ public class AuthService : IAuthService
                 Id = user.Id,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
-                Email = user.Email,
+                Login = user.Login,
                 LastLoginDate = user.LastLoginDate,
                 Role = user.Role,
                 DepartmentId = user.DepartmentId,

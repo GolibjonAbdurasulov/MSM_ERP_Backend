@@ -1,6 +1,7 @@
 using Core.Attributes;
 using DataAccess.Entities;
 using DataAccess.Repositories.DepartmentRepositories;
+using DataAccess.Repositories.JobRepositories;
 using Services.Interfaces;
 using Services.ViewModels.DepartmentViewModels;
 
@@ -9,10 +10,12 @@ namespace Services.Services;
 public class DepartmentService : IDepartmentService
 {
     private readonly IDepartmentRepository _departmentRepository;
+    private readonly IJobRepository _jobRepository;
 
-    public DepartmentService(IDepartmentRepository departmentRepository)
+    public DepartmentService(IDepartmentRepository departmentRepository, IJobRepository jobRepository)
     {
         _departmentRepository = departmentRepository;
+        _jobRepository = jobRepository;
     }
 
     public async Task<DepartmentGetViewModel> CreateDepartment(DepartmentCreationViewModel departmentModel)
@@ -20,7 +23,8 @@ public class DepartmentService : IDepartmentService
         var department = new Department
         {
             DepartmentShortName = departmentModel.DepartmentShortName,
-            DepartmentFullName = departmentModel.DepartmentFullName
+            DepartmentFullName = departmentModel.DepartmentFullName,
+            DepartmentWorkersCount = departmentModel.DepartmentWorkersCount,
         };
         var createdDepartment=await _departmentRepository.AddAsync(department);
         
@@ -29,7 +33,9 @@ public class DepartmentService : IDepartmentService
         {
             Id = createdDepartment.Id,
             DepartmentShortName = createdDepartment.DepartmentShortName,
-            DepartmentFullName = createdDepartment.DepartmentFullName
+            DepartmentFullName = createdDepartment.DepartmentFullName,
+            DepartmentWorkersCount = createdDepartment.DepartmentWorkersCount,
+            
         };
         
         return departmentGetViewModel;
@@ -43,6 +49,7 @@ public class DepartmentService : IDepartmentService
         
         departmentModel.DepartmentShortName = departmentModel.DepartmentShortName;
         departmentModel.DepartmentFullName = departmentModel.DepartmentFullName;
+        departmentModel.DepartmentWorkersCount = departmentModel.DepartmentWorkersCount;
         
         var updateDepartment=await _departmentRepository.UpdateAsync(department);
 
@@ -73,7 +80,8 @@ public class DepartmentService : IDepartmentService
         {
             Id = department.Id,
             DepartmentShortName = department.DepartmentShortName,
-            DepartmentFullName = department.DepartmentFullName
+            DepartmentFullName = department.DepartmentFullName,
+            DepartmentWorkersCount = department.DepartmentWorkersCount,
         };
         return departmentGetViewModel;
     }
@@ -87,9 +95,34 @@ public class DepartmentService : IDepartmentService
             departmentsViewModel.Add(new DepartmentGetViewModel()
             { Id = department.Id,
                     DepartmentShortName = department.DepartmentShortName,
-                    DepartmentFullName = department.DepartmentFullName
+                    DepartmentFullName = department.DepartmentFullName,
+                    DepartmentWorkersCount = department.DepartmentWorkersCount,
             });
         }
         return departmentsViewModel;  
+    }
+
+    public Task<DepartmentStatisticsGetViewModel> GetDepartmentStatistics(long id)
+    {
+        int activeJobs = 0;
+        int mobilizedWorkers = 0;
+        var jobs=_jobRepository.GetAllAsQueryable().
+            Where(job => job.DepartmentId == id).ToList();
+        foreach (Job job in jobs)
+        {
+            if (job.StartedDate <= DateTime.Now && job.EndDate >= DateTime.Now)
+            {
+                mobilizedWorkers += job.MobilizedWorkers;
+                activeJobs++;
+            }
+        }
+
+        var res = new DepartmentStatisticsGetViewModel
+        {
+            ActiveJobsCount = activeJobs,
+            MobilizedWorkers = mobilizedWorkers,
+        };
+
+        return Task.FromResult(res);
     }
 }

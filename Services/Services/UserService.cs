@@ -23,20 +23,16 @@ public class UserService : IUserService
 
     public async Task<UserGetViewModel> CreateUser(UserCreationViewModel model)
     {
-        if (await UserExists(model.Email))
+        if (await UserExists(model.Login))
             throw new ArgumentException("Email already exists");
-        var salt = GenerateSalt();
-        var hash = ComputeHash(model.Password, salt);
         var user = new User()
         {
             FirstName = model.FirstName,
             LastName = model.LastName,
-            Email = model.Email,
+            Login = model.Login,
             Password = model.Password,
             Role = model.Role,
             DepartmentId = model.DepartmentId,
-            PasswordHash = hash,
-            PasswordSalt = salt,
             IsSigned = false,
             LastLoginDate = DateTime.Now,
         };
@@ -47,7 +43,7 @@ public class UserService : IUserService
             Id = createdUser.Id,
             FirstName = createdUser.FirstName,
             LastName = createdUser.LastName,
-            Email = createdUser.Email,
+            Login = createdUser.Login,
             Role = createdUser.Role,
             DepartmentId = createdUser.DepartmentId,
             LastLoginDate = createdUser.LastLoginDate,
@@ -62,7 +58,7 @@ public class UserService : IUserService
             throw new Exception("User not found on UserService");
         user.FirstName = model.FirstName;
         user.LastName = model.LastName;
-        user.Email = model.Email;
+        user.Login = model.Login;
         user.Role = model.Role;
         user.DepartmentId = model.DepartmentId;
         
@@ -73,7 +69,7 @@ public class UserService : IUserService
             Id = updatedUser.Id,
             FirstName = updatedUser.FirstName,
             LastName = updatedUser.LastName,
-            Email = updatedUser.Email,
+            Login = updatedUser.Login,
             Role = updatedUser.Role,
             DepartmentId = updatedUser.DepartmentId,
             LastLoginDate = updatedUser.LastLoginDate,
@@ -91,37 +87,21 @@ public class UserService : IUserService
         return true;
     }
     
-    public Task<bool> CheckPasswordAsync(UserWithPasswordViewModel user, string password)
-    {
-        if (user == null)
-            throw new ArgumentNullException(nameof(user));
-
-        if (string.IsNullOrWhiteSpace(password))
-            return Task.FromResult(false);
-
-        bool isPasswordValid = VerifyHash(
-            password,
-            user.PasswordHash,
-            user.PasswordSalt);
-
-        return Task.FromResult(isPasswordValid);
-    }
+   
 
 
-    public async Task<UserWithPasswordViewModel> GetUserByEmail(string email)
+    public async Task<UserGetViewModel> GetUserByEmail(string email)
     {
         var user= await _userRepository
-            .FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
+            .FirstOrDefaultAsync(u => u.Login.ToLower() == email.ToLower());
         if (user == null)
             throw new NotFoundException("Email not exists");
-        var viewModel = new UserWithPasswordViewModel
+        var viewModel = new UserGetViewModel
         {
             Id = user.Id,
             FirstName = user.FirstName,
             LastName = user.LastName,
-            Email = user.Email,
-            PasswordHash = user.PasswordHash,
-            PasswordSalt = user.PasswordSalt,
+            Login = user.Login,
             LastLoginDate = user.LastLoginDate,
             Role = user.Role,
             DepartmentId = user.DepartmentId,
@@ -142,7 +122,7 @@ public class UserService : IUserService
             Id = user.Id,
             FirstName = user.FirstName,
             LastName = user.LastName,
-            Email = user.Email,
+            Login = user.Login,
             Role = user.Role,
             DepartmentId = user.DepartmentId,
             LastLoginDate = user.LastLoginDate, 
@@ -161,7 +141,7 @@ public class UserService : IUserService
             Id = user.Id,
             FirstName = user.FirstName,
             LastName = user.LastName,
-            Email = user.Email,
+            Login = user.Login,
             Role = user.Role,
             DepartmentId = user.DepartmentId,
             LastLoginDate = user.LastLoginDate,
@@ -182,7 +162,7 @@ public class UserService : IUserService
                 Id = user.Id,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
-                Email = user.Email,
+                Login = user.Login,
                 Role = user.Role,
                 DepartmentId = user.DepartmentId,
                 LastLoginDate = user.LastLoginDate,
@@ -204,7 +184,7 @@ public class UserService : IUserService
                 Id = user.Id,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
-                Email = user.Email,
+                Login = user.Login,
                 Role = user.Role,
                 DepartmentId = user.DepartmentId,
                 LastLoginDate = user.LastLoginDate,
@@ -215,30 +195,9 @@ public class UserService : IUserService
     }
     
 
-    public async Task<bool> UserExists(string email)
+    public async Task<bool> UserExists(string login)
     {
         return await _userRepository
-            .AnyAsync(u => u.Email.ToLower() == email.ToLower());
-    }
-    
-    
-    private static byte[] GenerateSalt(int size = 16)
-    {
-        var salt = new byte[size];
-        using var rng = RandomNumberGenerator.Create();
-        rng.GetBytes(salt);
-        return salt;
-    }
-
-    private static byte[] ComputeHash(string password, byte[] salt)
-    {
-        using var hmac = new HMACSHA512(salt);
-        return hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
-    }
-
-    private static bool VerifyHash(string password, byte[] storedHash, byte[] storedSalt)
-    {
-        var computedHash = ComputeHash(password, storedSalt);
-        return computedHash.SequenceEqual(storedHash);
+            .AnyAsync(u => u.Login.ToLower() == login.ToLower());
     }
 }

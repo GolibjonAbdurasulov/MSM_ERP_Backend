@@ -16,8 +16,8 @@ public class User : BaseEntity<long>
     public string LastName { get; set; } = string.Empty;
     
     [Required]
-    [Column("email")] 
-    public string Email { get; set; }= string.Empty;
+    [Column("login")] 
+    public string Login { get; set; }= string.Empty;
     
     [Required]
     [Column("password")] 
@@ -27,15 +27,6 @@ public class User : BaseEntity<long>
     public UserRole Role { get; set; }
     [Column("department_id"),ForeignKey(nameof(Department))] public long DepartmentId { get; set; }
     public virtual Department Department { get; set; }
-    
-    [Required]
-    [Column("password_hash")]
-    public byte[] PasswordHash { get; set; } 
-
-    [Required]
-    [Column("password_salt")]
-    public byte[] PasswordSalt { get; set; } 
-    
     [Column("is_signed")]
     public bool IsSigned { get; set; }
     [Column("last_login_date")]
