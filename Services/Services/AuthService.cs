@@ -23,13 +23,8 @@ public class AuthService : IAuthService
         {
             if (await _userService.UserExists(request.Email))
                 throw new ArgumentException("Email already exists");
-
-            if (string.IsNullOrWhiteSpace(request.Password) || request.Password.Length < 8)
-                throw new ArgumentException("Password must be at least 8 characters");
-
-            if (!IsStrongPassword(request.Password, request.FirstName, request.LastName))
-                throw new ArgumentException("Password is too weak");
-
+            
+            
             var userVm = new UserCreationViewModel
             {
                 FirstName = request.FirstName,
@@ -82,21 +77,21 @@ public class AuthService : IAuthService
         }
 
 
-        private static bool IsStrongPassword(string password, string firstName, string lastName)
-        {
-            if (password.Length < 8) return false;
-            if (!password.Any(char.IsLower)) return false;
-            if (!password.Any(char.IsUpper)) return false;
-            if (!password.Any(char.IsDigit)) return false;
-            if (!password.Any(ch => !char.IsLetterOrDigit(ch))) return false;
-
-            var normPassword = password.Replace("'", "").ToLower();
-            var normFirst = firstName.Replace("'", "").ToLower();
-            var normLast = lastName.Replace("'", "").ToLower();
-
-            if (!string.IsNullOrEmpty(firstName) && normPassword.Contains(normFirst)) return false;
-            if (!string.IsNullOrEmpty(lastName) && normPassword.Contains(normLast)) return false;
-
-            return true;
-        }
+        // private static bool IsStrongPassword(string password, string firstName, string lastName)
+        // {
+        //     if (password.Length < 8) return false;
+        //     if (!password.Any(char.IsLower)) return false;
+        //     if (!password.Any(char.IsUpper)) return false;
+        //     if (!password.Any(char.IsDigit)) return false;
+        //     if (!password.Any(ch => !char.IsLetterOrDigit(ch))) return false;
+        //
+        //     var normPassword = password.Replace("'", "").ToLower();
+        //     var normFirst = firstName.Replace("'", "").ToLower();
+        //     var normLast = lastName.Replace("'", "").ToLower();
+        //
+        //     if (!string.IsNullOrEmpty(firstName) && normPassword.Contains(normFirst)) return false;
+        //     if (!string.IsNullOrEmpty(lastName) && normPassword.Contains(normLast)) return false;
+        //
+        //     return true;
+        // }
     }

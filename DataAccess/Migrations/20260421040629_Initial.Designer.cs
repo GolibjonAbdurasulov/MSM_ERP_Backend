@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DataAccess.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260408041320_Initial")]
+    [Migration("20260421040629_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -90,6 +90,10 @@ namespace DataAccess.Migrations
                         .HasColumnType("text")
                         .HasColumnName("department_short_name");
 
+                    b.Property<int>("DepartmentWorkersCount")
+                        .HasColumnType("integer")
+                        .HasColumnName("department_workers_count");
+
                     b.HasKey("Id");
 
                     b.ToTable("departments");
@@ -122,6 +126,10 @@ namespace DataAccess.Migrations
                         .HasColumnType("integer")
                         .HasDefaultValue(0)
                         .HasColumnName("job_status");
+
+                    b.Property<int>("MobilizedWorkers")
+                        .HasColumnType("integer")
+                        .HasColumnName("mobilized_workers");
 
                     b.Property<DateTime>("PublishedDate")
                         .HasColumnType("timestamp without time zone")
@@ -163,11 +171,6 @@ namespace DataAccess.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("department_id");
 
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("email");
-
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasColumnType("text")
@@ -186,20 +189,15 @@ namespace DataAccess.Migrations
                         .HasColumnType("text")
                         .HasColumnName("last_name");
 
+                    b.Property<string>("Login")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("login");
+
                     b.Property<string>("Password")
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("password");
-
-                    b.Property<byte[]>("PasswordHash")
-                        .IsRequired()
-                        .HasColumnType("bytea")
-                        .HasColumnName("password_hash");
-
-                    b.Property<byte[]>("PasswordSalt")
-                        .IsRequired()
-                        .HasColumnType("bytea")
-                        .HasColumnName("password_salt");
 
                     b.Property<int>("Role")
                         .HasColumnType("integer")

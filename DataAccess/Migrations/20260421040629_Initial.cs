@@ -19,7 +19,8 @@ namespace DataAccess.Migrations
                     id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     department_short_name = table.Column<string>(type: "text", nullable: false),
-                    department_full_name = table.Column<string>(type: "text", nullable: false)
+                    department_full_name = table.Column<string>(type: "text", nullable: false),
+                    department_workers_count = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -34,12 +35,10 @@ namespace DataAccess.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     first_name = table.Column<string>(type: "text", nullable: false),
                     last_name = table.Column<string>(type: "text", nullable: false),
-                    email = table.Column<string>(type: "text", nullable: false),
+                    login = table.Column<string>(type: "text", nullable: false),
                     password = table.Column<string>(type: "text", nullable: false),
                     role = table.Column<int>(type: "integer", nullable: false),
                     department_id = table.Column<long>(type: "bigint", nullable: false),
-                    password_hash = table.Column<byte[]>(type: "bytea", nullable: false),
-                    password_salt = table.Column<byte[]>(type: "bytea", nullable: false),
                     is_signed = table.Column<bool>(type: "boolean", nullable: false),
                     last_login_date = table.Column<DateTime>(type: "timestamp without time zone", nullable: false)
                 },
@@ -64,6 +63,7 @@ namespace DataAccess.Migrations
                     description = table.Column<string>(type: "text", nullable: false),
                     job_status = table.Column<int>(type: "integer", nullable: false, defaultValue: 0),
                     publisher_id = table.Column<long>(type: "bigint", nullable: false),
+                    mobilized_workers = table.Column<int>(type: "integer", nullable: false),
                     department_id = table.Column<long>(type: "bigint", nullable: false),
                     published_date = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     started_date = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),

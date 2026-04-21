@@ -55,4 +55,12 @@ public class DepartmentController : ControllerBase
         var department=await _departmentService.GetDepartmentById(id);
         return (department,200);
     }
+    
+    [HttpGet]
+    [Authorize]
+    public async Task<ResponseModelBase> GetDepartmentStatistics(long id)
+    {
+        var department=await _departmentService.GetDepartmentStatistics(id);
+        return (department,200);
+    }
 }
