@@ -58,9 +58,9 @@ public class DepartmentController : ControllerBase
     
     [HttpGet]
     [Authorize]
-    public async Task<ResponseModelBase> GetDepartmentStatistics(long id)
+    public async Task<ResponseModelBase> GetDepartmentStatistics(long id, DateTime date)
     {
-        var department=await _departmentService.GetDepartmentStatistics(id);
+        var department=await _departmentService.GetDepartmentStatistics(id,date);
         return (department,200);
     }
 }

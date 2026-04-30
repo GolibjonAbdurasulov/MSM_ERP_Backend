@@ -102,7 +102,7 @@ public class DepartmentService : IDepartmentService
         return departmentsViewModel;  
     }
 
-    public Task<DepartmentStatisticsGetViewModel> GetDepartmentStatistics(long id)
+    public Task<DepartmentStatisticsGetViewModel> GetDepartmentStatistics(long id, DateTime date)
     {
         int activeJobs = 0;
         int mobilizedWorkers = 0;
@@ -110,7 +110,7 @@ public class DepartmentService : IDepartmentService
             Where(job => job.DepartmentId == id).ToList();
         foreach (Job job in jobs)
         {
-            if (job.StartedDate <= DateTime.Now && job.EndDate >= DateTime.Now)
+            if (job.StartedDate.Date <= date.Date && job.EndDate.Date >= date.Date)
             {
                 mobilizedWorkers += job.MobilizedWorkers;
                 activeJobs++;
