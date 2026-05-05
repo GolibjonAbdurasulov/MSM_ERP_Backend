@@ -15,6 +15,7 @@ public class AppDbContext : DbContext
     public DbSet<Department> Departments { get; set; }
     public DbSet<Job> Jobs { get; set; }
     public DbSet<Comment> Comments { get; set; }
+    public DbSet<Worker> Workers { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

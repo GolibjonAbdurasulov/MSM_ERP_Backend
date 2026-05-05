@@ -32,6 +32,14 @@ public class JobController : ControllerBase
         var job=await _jobService.UpdateJob(model);
         return (job,200);
     }
+
+    [HttpDelete]
+    [Authorize]
+    public async Task<ResponseModelBase> RemoveWorkerFromJob(long jobId, long workerId)
+    {
+        var job=await _jobService.RemoveWorkerFromJob(jobId,workerId);
+        return (job,200);
+    }
     
     [HttpDelete]
     [Authorize]

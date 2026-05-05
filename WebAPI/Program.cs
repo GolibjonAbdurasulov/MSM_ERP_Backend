@@ -10,6 +10,7 @@ using Services.Settings;
 using WebAPI.Middlewares;
 using Core.Hubs;
 using DataAccess.DataContext;
+using OfficeOpenXml;
 using WebAPI.Extension;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -139,6 +140,7 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
+ExcelPackage.License.SetNonCommercialPersonal("MSM ERP");
 // Services
 builder.Services.ConfigureRepositories();
 builder.Services.AddMemoryCache();

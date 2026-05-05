@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -54,6 +55,28 @@ namespace DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "workers",
+                columns: table => new
+                {
+                    id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    department_id = table.Column<long>(type: "bigint", nullable: false),
+                    personnel_number = table.Column<long>(type: "bigint", nullable: false),
+                    full_name = table.Column<string>(type: "text", nullable: false),
+                    position = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_workers", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_workers_departments_department_id",
+                        column: x => x.department_id,
+                        principalTable: "departments",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "jobs",
                 columns: table => new
                 {
@@ -63,7 +86,7 @@ namespace DataAccess.Migrations
                     description = table.Column<string>(type: "text", nullable: false),
                     job_status = table.Column<int>(type: "integer", nullable: false, defaultValue: 0),
                     publisher_id = table.Column<long>(type: "bigint", nullable: false),
-                    mobilized_workers = table.Column<int>(type: "integer", nullable: false),
+                    mobilized_workers = table.Column<List<long>>(type: "bigint[]", nullable: false),
                     department_id = table.Column<long>(type: "bigint", nullable: false),
                     published_date = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     started_date = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
@@ -140,6 +163,11 @@ namespace DataAccess.Migrations
                 name: "IX_users_department_id",
                 table: "users",
                 column: "department_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_workers_department_id",
+                table: "workers",
+                column: "department_id");
         }
 
         /// <inheritdoc />
@@ -147,6 +175,9 @@ namespace DataAccess.Migrations
         {
             migrationBuilder.DropTable(
                 name: "Comments");
+
+            migrationBuilder.DropTable(
+                name: "workers");
 
             migrationBuilder.DropTable(
                 name: "jobs");

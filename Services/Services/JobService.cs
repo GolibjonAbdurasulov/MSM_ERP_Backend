@@ -175,6 +175,20 @@ public class JobService : IJobService
                        j.StartedDate.Date<=time.Date && j.EndDate.Date>=time.Date)
             .ToListAsync();
         return jobs.Count;
+    }  
+    
+    public async Task<bool> RemoveWorkerFromJob(long jobId,long workerId)
+    {
+       var job=await _jobRepository.GetByIdAsync(jobId);
+       if (job==null)
+           throw new NotFoundException("job not found on JobService"); 
+       var removed = job.MobilizedWorkers.Remove(workerId);
+       
+       if (!removed)
+           throw new Exception("Worker not found in MobilizedWorkers");
+
+       await _jobRepository.UpdateAsync(job);
+       return true;
     }    
     
     public async Task<List<JobGetViewModel>> GetAllJobs()

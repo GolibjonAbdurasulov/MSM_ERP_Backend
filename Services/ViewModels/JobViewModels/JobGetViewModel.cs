@@ -9,7 +9,7 @@ public class JobGetViewModel
     public string Description { get; set; }
     public JobStatus JobStatus { get; set; }
     public long PublisherId { get; set; }
-    public int MobilizedWorkers { get; set; }
+    public List<long> MobilizedWorkers { get; set; }
     public string PublisherName { get; set; }
     public long DepartmentId { get; set; }
     public string DepartmentName { get; set; }

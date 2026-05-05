@@ -10,4 +10,8 @@
       <ProjectReference Include="..\DataAccess\DataAccess.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="EPPlus" Version="8.5.4" />
+    </ItemGroup>
+
 </Project>

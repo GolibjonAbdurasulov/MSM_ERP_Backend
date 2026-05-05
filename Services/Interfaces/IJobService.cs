@@ -10,5 +10,6 @@ public interface IJobService
     public Task<JobGetViewModel> GetJobById(long id);
     public Task<List<JobGetViewModel>> GetJobsByDepartmentId(long id,DateTime time);
     public Task<int> GetDepartmentActiveJobsCount(long departmentId, DateTime time);
-    public Task<List<JobGetViewModel>> GetAllJobs(); 
+    public Task<List<JobGetViewModel>> GetAllJobs();
+    public Task<bool> RemoveWorkerFromJob(long jobId, long workerId);
 }

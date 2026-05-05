@@ -112,7 +112,7 @@ public class DepartmentService : IDepartmentService
         {
             if (job.StartedDate.Date <= date.Date && job.EndDate.Date >= date.Date)
             {
-                mobilizedWorkers += job.MobilizedWorkers;
+                mobilizedWorkers += job.MobilizedWorkers.Count;
                 activeJobs++;
             }
         }
