@@ -10,6 +10,7 @@ public class UserGetViewModel
     public string Login { get; set; }
     public UserRole Role { get; set; }
     public long DepartmentId { get; set; }
+    public long SubDepartmentId { get; set; }
     public DateTime LastLoginDate { get; set; }
     public bool IsSigned { get; set; }
 }

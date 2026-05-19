@@ -10,6 +10,7 @@ public class JobCreationViewModel
     public long PublisherId { get; set; }
     public List<long> MobilizedWorkers { get; set; }
     public long DepartmentId { get; set; }
+    public long SubDepartmentId { get; set; }
     public DateTime StartedDate { get; set; }
     public DateTime EndDate { get; set; }
 }

@@ -2,7 +2,9 @@ using Core.Attributes;
 using Core.Hubs;
 using DataAccess.Entities;
 using DataAccess.Exeptions;
+using DataAccess.Repositories.DepartmentRepositories;
 using DataAccess.Repositories.JobRepositories;
+using DataAccess.Repositories.TelegramChatRepositories;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Services.Interfaces;
@@ -13,11 +15,24 @@ namespace Services.Services;
 public class JobService : IJobService
 {
     private readonly IJobRepository _jobRepository;
-    private readonly IHubContext<JobHub> _hubContext;   
-    public JobService(IJobRepository jobRepository, IHubContext<JobHub> hubContext)
+    private readonly IHubContext<JobHub> _hubContext; 
+    private readonly ITelegramSender _telegramSender;
+    private readonly IWorkerService _workerService;
+    private readonly ITelegramChatRepository _telegramChatRepository;
+    private readonly ISubDepartmentRepository _subDepartmentRepository;
+
+    public JobService(IJobRepository jobRepository,
+        IHubContext<JobHub> hubContext, 
+        ITelegramSender telegramSender, 
+        IWorkerService workerService,
+        ITelegramChatRepository telegramChatService, ISubDepartmentRepository subDepartmentRepository)
     {
         _jobRepository = jobRepository;
         _hubContext = hubContext;
+        _telegramSender = telegramSender;
+        _workerService = workerService;
+        _telegramChatRepository = telegramChatService;
+        _subDepartmentRepository = subDepartmentRepository;
     }
 
     public async Task<JobGetViewModel> CreateJob(JobCreationViewModel model)
@@ -33,9 +48,29 @@ public class JobService : IJobService
             PublishedDate = DateTime.Now,
             StartedDate = model.StartedDate,
             EndDate = model.EndDate,
+            SubDepartmentId = model.SubDepartmentId,
         };
-
+        
         var createdJob = await _jobRepository.AddAsync(job);
+        var subDepartment= await _subDepartmentRepository.GetByIdAsync(createdJob.SubDepartmentId);
+        var chat= await _telegramChatRepository.GetByIdAsync(subDepartment.SubDepartmentTelegramChatId);
+       
+        if (chat == null)
+            throw new NotFoundException("chat not found");
+        
+        var workersName = await GetWorkersName(job.MobilizedWorkers);
+        var text = $"""
+                    📌 Yangi vazifa
+
+                    Nomi: {job.Title}
+                    Batafsil: {job.Description}
+                    Boshlanishi: {job.StartedDate}
+                    Tugatishi: {job.EndDate}
+                    Bajaruvchilar: 
+                    {workersName} 
+                    """;
+        
+          await _telegramSender.SendJobTextMessageAsync(chat.ChatId, text);
         
         await _hubContext.Clients.All.SendAsync(
             "JobChanged",
@@ -57,6 +92,7 @@ public class JobService : IJobService
             PublishedDate = createdJob.PublishedDate,
             StartedDate = createdJob.StartedDate,
             EndDate = createdJob.EndDate,
+            SubDepartmentId = createdJob.SubDepartmentId,
         };
         return jobGetViewModel;
     }
@@ -93,6 +129,7 @@ public class JobService : IJobService
             StartedDate = updatedJob.StartedDate,
             EndDate = updatedJob.EndDate,
             MobilizedWorkers = updatedJob.MobilizedWorkers,
+            SubDepartmentId = updatedJob.SubDepartmentId,
         };
         
         return jobGetViewModel;
@@ -135,6 +172,7 @@ public class JobService : IJobService
            EndDate = job.EndDate,
            DepartmentName = job.Department.DepartmentFullName,
            PublisherName = job.Publisher.FirstName + " " + job.Publisher.LastName,
+           SubDepartmentId = job.SubDepartmentId,
        };
        return jobGetViewModel;
     }
@@ -163,11 +201,14 @@ public class JobService : IJobService
                 EndDate = job.EndDate,
                 DepartmentName = job.Department.DepartmentFullName,
                 PublisherName = job.Publisher.FirstName + " " + job.Publisher.LastName,
+                SubDepartmentId = job.SubDepartmentId,
             });
         }
         return jobGetViewModels;
     }
 
+    
+    
     public async Task<int> GetDepartmentActiveJobsCount(long departmentId,DateTime time)
     {
         var jobs=await _jobRepository.GetAllAsQueryable().
@@ -212,8 +253,24 @@ public class JobService : IJobService
                 EndDate = job.EndDate,
                 DepartmentName = job.Department.DepartmentFullName,
                 PublisherName = job.Publisher.FirstName + " " + job.Publisher.LastName,
+                SubDepartmentId = job.SubDepartmentId,
             });
         }
         return jobGetViewModels;
+    }
+
+    private async Task<string> GetWorkersName(List<long> ids)
+    {
+        var res = "";
+        int counter = 1;
+        foreach (long id in ids)
+        {
+            var worker = await _workerService.GetWorkerById(id);
+            res += $"{counter}. ";
+            
+            res += worker.FullName+"\n";
+            counter++;
+        }
+        return res;
     }
 }

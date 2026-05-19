@@ -16,6 +16,8 @@ public class AppDbContext : DbContext
     public DbSet<Job> Jobs { get; set; }
     public DbSet<Comment> Comments { get; set; }
     public DbSet<Worker> Workers { get; set; }
+    public DbSet<SubDepartment> SubDepartments { get; set; }
+    public DbSet<TelegramChat> TelegramChats { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -44,17 +46,27 @@ public class AppDbContext : DbContext
             .WithMany() 
             .HasForeignKey(c => c.JobId)
             .OnDelete(DeleteBehavior.Cascade);
-
         
         modelBuilder.Entity<Comment>()
             .HasOne(c => c.Publisher)
             .WithMany() 
             .HasForeignKey(c => c.PublisherId)
             .OnDelete(DeleteBehavior.Restrict);
-
         
         modelBuilder.Entity<Job>()
             .Property(j => j.JobStatus)
             .HasDefaultValue(DataAccess.Enums.JobStatus.Created); 
+        
+        modelBuilder.Entity<Worker>().
+            HasOne(w => w.Department)
+            .WithMany()
+            .HasForeignKey(w => w.DepartmentId)
+            .OnDelete(DeleteBehavior.Restrict);
+        
+        modelBuilder.Entity<Worker>().
+            HasOne(w => w.SubDepartment)
+            .WithMany()
+            .HasForeignKey(w => w.SubDepartmentId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

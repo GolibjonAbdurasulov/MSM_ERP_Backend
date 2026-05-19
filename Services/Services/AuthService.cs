@@ -32,7 +32,8 @@ public class AuthService : IAuthService
                 Login = request.Email,
                 Password = request.Password, 
                 Role = request.Role,
-                DepartmentId = request.DepartmentId
+                DepartmentId = request.DepartmentId,
+                SubDepartmentId = request.SubDepartmentId
             };
 
             return await _userService.CreateUser(userVm);
@@ -61,7 +62,8 @@ public class AuthService : IAuthService
                 Role = user.Role,
                 DepartmentId = user.DepartmentId,
                 Token = tokenResponse.AccessToken,
-                TokenExpiresIn = tokenResponse.ExpiresIn
+                TokenExpiresIn = tokenResponse.ExpiresIn,
+                SubDepartmentId = user.SubDepartmentId
             };
 
             return viewModel;

@@ -1,7 +1,10 @@
 using Core.Attributes;
 using DataAccess.Entities;
+using DataAccess.Enums;
 using DataAccess.Repositories.DepartmentRepositories;
 using DataAccess.Repositories.JobRepositories;
+using DataAccess.Repositories.WorkerRepositories;
+using Microsoft.EntityFrameworkCore;
 using Services.Interfaces;
 using Services.ViewModels.DepartmentViewModels;
 
@@ -11,11 +14,12 @@ public class DepartmentService : IDepartmentService
 {
     private readonly IDepartmentRepository _departmentRepository;
     private readonly IJobRepository _jobRepository;
-
-    public DepartmentService(IDepartmentRepository departmentRepository, IJobRepository jobRepository)
+    private readonly IWorkerRepository _workerRepository;
+    public DepartmentService(IDepartmentRepository departmentRepository, IJobRepository jobRepository, IWorkerRepository workerRepository)
     {
         _departmentRepository = departmentRepository;
         _jobRepository = jobRepository;
+        _workerRepository = workerRepository;
     }
 
     public async Task<DepartmentGetViewModel> CreateDepartment(DepartmentCreationViewModel departmentModel)
@@ -24,7 +28,6 @@ public class DepartmentService : IDepartmentService
         {
             DepartmentShortName = departmentModel.DepartmentShortName,
             DepartmentFullName = departmentModel.DepartmentFullName,
-            DepartmentWorkersCount = departmentModel.DepartmentWorkersCount,
         };
         var createdDepartment=await _departmentRepository.AddAsync(department);
         
@@ -34,8 +37,6 @@ public class DepartmentService : IDepartmentService
             Id = createdDepartment.Id,
             DepartmentShortName = createdDepartment.DepartmentShortName,
             DepartmentFullName = createdDepartment.DepartmentFullName,
-            DepartmentWorkersCount = createdDepartment.DepartmentWorkersCount,
-            
         };
         
         return departmentGetViewModel;
@@ -49,7 +50,6 @@ public class DepartmentService : IDepartmentService
         
         departmentModel.DepartmentShortName = departmentModel.DepartmentShortName;
         departmentModel.DepartmentFullName = departmentModel.DepartmentFullName;
-        departmentModel.DepartmentWorkersCount = departmentModel.DepartmentWorkersCount;
         
         var updateDepartment=await _departmentRepository.UpdateAsync(department);
 
@@ -81,7 +81,6 @@ public class DepartmentService : IDepartmentService
             Id = department.Id,
             DepartmentShortName = department.DepartmentShortName,
             DepartmentFullName = department.DepartmentFullName,
-            DepartmentWorkersCount = department.DepartmentWorkersCount,
         };
         return departmentGetViewModel;
     }
@@ -96,7 +95,6 @@ public class DepartmentService : IDepartmentService
             { Id = department.Id,
                     DepartmentShortName = department.DepartmentShortName,
                     DepartmentFullName = department.DepartmentFullName,
-                    DepartmentWorkersCount = department.DepartmentWorkersCount,
             });
         }
         return departmentsViewModel;  
@@ -105,14 +103,25 @@ public class DepartmentService : IDepartmentService
     public Task<DepartmentStatisticsGetViewModel> GetDepartmentStatistics(long id, DateTime date)
     {
         int activeJobs = 0;
-        int mobilizedWorkers = 0;
-        var jobs=_jobRepository.GetAllAsQueryable().
-            Where(job => job.DepartmentId == id).ToList();
+        var mobilizedWorkerIds = new HashSet<long>(); // HashSet — takrorlanmaydi
+       
+        int departmentWorkersCount = _workerRepository
+            .GetAllAsQueryable()
+            .Count(w => w.SubDepartmentId == id);
+
+        var jobs = _jobRepository.GetAllAsQueryable()
+            .Where(job => job.DepartmentId == id)
+            .ToList();
+
+        //&& job.JobStatus==JobStatus.InProgress
         foreach (Job job in jobs)
         {
-            if (job.StartedDate.Date <= date.Date && job.EndDate.Date >= date.Date)
+            if (job.StartedDate.Date <= date.Date && job.EndDate.Date >= date.Date )
             {
-                mobilizedWorkers += job.MobilizedWorkers.Count;
+                foreach (var workerId in job.MobilizedWorkers)
+                {
+                    mobilizedWorkerIds.Add(workerId); 
+                }
                 activeJobs++;
             }
         }
@@ -120,9 +129,29 @@ public class DepartmentService : IDepartmentService
         var res = new DepartmentStatisticsGetViewModel
         {
             ActiveJobsCount = activeJobs,
-            MobilizedWorkers = mobilizedWorkers,
+            MobilizedWorkers = mobilizedWorkerIds.Count,
+            DepartmentWorkersCount = departmentWorkersCount,
         };
 
         return Task.FromResult(res);
+    }
+
+    public  async Task<List<AllDepartmentStatisticsGetViewModel>> GetAllDepartmentStatistics(DateTime date)
+    {
+        var res= new List<AllDepartmentStatisticsGetViewModel>();
+        var departments =await _departmentRepository.GetAllAsQueryable().ToListAsync();
+        var ids=departments.Select(id=>id.Id).ToList();
+        foreach (long id in ids)
+        {
+            var viewModel = await this.GetDepartmentStatistics(id, date);
+           res.Add(new AllDepartmentStatisticsGetViewModel
+           {
+               DepartmentId = id,
+               ActiveJobsCount = viewModel.ActiveJobsCount,
+               MobilizedWorkers = viewModel.MobilizedWorkers,
+               DepartmentWorkersCount = viewModel.DepartmentWorkersCount,
+           });
+        }
+        return res;
     }
 }

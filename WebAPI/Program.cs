@@ -11,6 +11,7 @@ using WebAPI.Middlewares;
 using Core.Hubs;
 using DataAccess.DataContext;
 using OfficeOpenXml;
+using Telegram.Bot;
 using WebAPI.Extension;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -30,6 +31,7 @@ builder.Services.AddDbContextPool<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnectionString"));
     options.UseLazyLoadingProxies();
 });
+
 
 // JWT Settings
 var tokenSettingsSection = builder.Configuration.GetSection("TokenSettings");
@@ -141,15 +143,27 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 ExcelPackage.License.SetNonCommercialPersonal("MSM ERP");
+
 // Services
 builder.Services.ConfigureRepositories();
 builder.Services.AddMemoryCache();
 builder.Services.ConfigureServicesFromTypeAssembly<CommentService>();
 builder.Services.ConfigureServicesFromTypeAssembly<UserService>();
 builder.Services.ConfigureServicesFromTypeAssembly<DepartmentService>();
+builder.Services.ConfigureServicesFromTypeAssembly<SubDepartmentService>();
 builder.Services.ConfigureServicesFromTypeAssembly<JobService>();
 builder.Services.ConfigureServicesFromTypeAssembly<TokenService>();
 builder.Services.ConfigureServicesFromTypeAssembly<AuthService>();
+builder.Services.ConfigureServicesFromTypeAssembly<TelegramChatService>();
+builder.Services.ConfigureServicesFromTypeAssembly<TelegramSenderService>();
+
+builder.Services.AddSingleton<ITelegramBotClient>(
+    new TelegramBotClient(builder.Configuration["Telegram:BotToken"]));
+
+builder.Services.AddScoped<TelegramUpdateHandler>();
+
+builder.Services.AddHostedService<TelegramBackgroundService>();
+
 
 // Middleware
 builder.Services.AddTransient<GlobalExceptionHandlerMiddleware>();

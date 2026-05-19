@@ -28,4 +28,15 @@ public class StatisticsController : ControllerBase
         
         return (res,200);
     }
+    
+    [HttpGet("statistics/export")]
+    public async Task<IActionResult> Export(long departmentId, DateTime fromDate, DateTime toDate)
+    {
+        var bytes = await _statisticsService.ExportStatisticsAsync(departmentId, fromDate, toDate);
+    
+        return File(
+            bytes,
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            $"hisobot_{fromDate:yyyyMMdd}_{toDate:yyyyMMdd}.xlsx");
+    }
 }

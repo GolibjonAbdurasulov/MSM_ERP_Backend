@@ -66,7 +66,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("PublisherId");
 
-                    b.ToTable("Comments");
+                    b.ToTable("comments");
                 });
 
             modelBuilder.Entity("DataAccess.Entities.Department", b =>
@@ -87,10 +87,6 @@ namespace DataAccess.Migrations
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("department_short_name");
-
-                    b.Property<int>("DepartmentWorkersCount")
-                        .HasColumnType("integer")
-                        .HasColumnName("department_workers_count");
 
                     b.HasKey("Id");
 
@@ -142,6 +138,10 @@ namespace DataAccess.Migrations
                         .HasColumnType("timestamp without time zone")
                         .HasColumnName("started_date");
 
+                    b.Property<long>("SubDepartmentId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("sub_department_id");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -154,7 +154,87 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("PublisherId");
 
+                    b.HasIndex("SubDepartmentId");
+
                     b.ToTable("jobs");
+                });
+
+            modelBuilder.Entity("DataAccess.Entities.SubDepartment", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("DepartmentId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("department_id");
+
+                    b.Property<string>("SubDepartmentFullName")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("sub_department_full_name");
+
+                    b.Property<string>("SubDepartmentShortName")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("sub_department_short_name");
+
+                    b.Property<long>("SubDepartmentTelegramChatId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("sub_department_telegram_chat_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DepartmentId");
+
+                    b.ToTable("sub_departments");
+                });
+
+            modelBuilder.Entity("DataAccess.Entities.TelegramChat", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<bool>("BotAdded")
+                        .HasColumnType("boolean")
+                        .HasColumnName("bot_added");
+
+                    b.Property<bool>("CanSendMessage")
+                        .HasColumnType("boolean")
+                        .HasColumnName("can_send_message");
+
+                    b.Property<long>("ChatId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("chat_id");
+
+                    b.Property<string>("ChatType")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("chat_type");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_active");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("title");
+
+                    b.Property<string>("Username")
+                        .HasColumnType("text")
+                        .HasColumnName("username");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("telegram_chats");
                 });
 
             modelBuilder.Entity("DataAccess.Entities.User", b =>
@@ -202,9 +282,15 @@ namespace DataAccess.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("role");
 
+                    b.Property<long>("SubDepartmentId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("sub_department_id");
+
                     b.HasKey("Id");
 
                     b.HasIndex("DepartmentId");
+
+                    b.HasIndex("SubDepartmentId");
 
                     b.ToTable("users");
                 });
@@ -227,8 +313,9 @@ namespace DataAccess.Migrations
                         .HasColumnType("text")
                         .HasColumnName("full_name");
 
-                    b.Property<long>("PersonnelNumber")
-                        .HasColumnType("bigint")
+                    b.Property<string>("PersonnelNumber")
+                        .IsRequired()
+                        .HasColumnType("text")
                         .HasColumnName("personnel_number");
 
                     b.Property<string>("Position")
@@ -236,9 +323,15 @@ namespace DataAccess.Migrations
                         .HasColumnType("text")
                         .HasColumnName("position");
 
+                    b.Property<long>("SubDepartmentId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("sub_department_id");
+
                     b.HasKey("Id");
 
                     b.HasIndex("DepartmentId");
+
+                    b.HasIndex("SubDepartmentId");
 
                     b.ToTable("workers");
                 });
@@ -276,9 +369,28 @@ namespace DataAccess.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("DataAccess.Entities.SubDepartment", "SubDepartment")
+                        .WithMany()
+                        .HasForeignKey("SubDepartmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Department");
 
                     b.Navigation("Publisher");
+
+                    b.Navigation("SubDepartment");
+                });
+
+            modelBuilder.Entity("DataAccess.Entities.SubDepartment", b =>
+                {
+                    b.HasOne("DataAccess.Entities.Department", "Department")
+                        .WithMany()
+                        .HasForeignKey("DepartmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Department");
                 });
 
             modelBuilder.Entity("DataAccess.Entities.User", b =>
@@ -289,7 +401,15 @@ namespace DataAccess.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("DataAccess.Entities.SubDepartment", "SubDepartment")
+                        .WithMany()
+                        .HasForeignKey("SubDepartmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Department");
+
+                    b.Navigation("SubDepartment");
                 });
 
             modelBuilder.Entity("DataAccess.Entities.Worker", b =>
@@ -297,10 +417,18 @@ namespace DataAccess.Migrations
                     b.HasOne("DataAccess.Entities.Department", "Department")
                         .WithMany()
                         .HasForeignKey("DepartmentId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("DataAccess.Entities.SubDepartment", "SubDepartment")
+                        .WithMany()
+                        .HasForeignKey("SubDepartmentId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Department");
+
+                    b.Navigation("SubDepartment");
                 });
 #pragma warning restore 612, 618
         }

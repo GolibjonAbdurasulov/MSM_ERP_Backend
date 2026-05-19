@@ -10,4 +10,5 @@ public class UserCreationViewModel
     public string Password { get; set; }
     public UserRole Role { get; set; }
     public long DepartmentId { get; set; }
+    public long SubDepartmentId { get; set; }
 }

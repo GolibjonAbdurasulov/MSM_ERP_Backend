@@ -8,8 +8,12 @@ public class Worker : BaseEntity<long>
    public long DepartmentId { get; set; }
    public virtual Department Department { get; set; }
    
+   [Column("sub_department_id"),ForeignKey(nameof(SubDepartment))]
+   public long SubDepartmentId { get; set; }
+   public virtual SubDepartment SubDepartment { get; set; }
+   
    [Column("personnel_number")]
-   public long PersonnelNumber { get; set; }
+   public string PersonnelNumber { get; set; }
    
    [Column("full_name")]
    public string FullName { get; set; }

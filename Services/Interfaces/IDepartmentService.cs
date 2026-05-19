@@ -10,4 +10,5 @@ public interface IDepartmentService
     public Task<DepartmentGetViewModel> GetDepartmentById(long id);
     public Task<List<DepartmentGetViewModel>> GetAllDepartments();
     public Task<DepartmentStatisticsGetViewModel> GetDepartmentStatistics(long id, DateTime date);
+    Task<List<AllDepartmentStatisticsGetViewModel>> GetAllDepartmentStatistics( DateTime date);
 }

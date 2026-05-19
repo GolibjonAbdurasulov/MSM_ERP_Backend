@@ -4,4 +4,5 @@ public class DepartmentStatisticsGetViewModel
 {
     public int ActiveJobsCount { get; set; }
     public int MobilizedWorkers { get; set; }
+    public int DepartmentWorkersCount { get; set; }
 }

@@ -12,6 +12,7 @@ public class JobGetViewModel
     public List<long> MobilizedWorkers { get; set; }
     public string PublisherName { get; set; }
     public long DepartmentId { get; set; }
+    public long SubDepartmentId { get; set; }
     public string DepartmentName { get; set; }
 
     public DateTime PublishedDate { get; set; }

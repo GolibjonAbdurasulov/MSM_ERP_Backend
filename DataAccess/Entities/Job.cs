@@ -31,6 +31,11 @@ public class Job : BaseEntity<long>
     public long DepartmentId { get; set; }
     public virtual Department Department { get; set; }
     
+    [Required] 
+    [Column("sub_department_id"), ForeignKey(nameof(SubDepartment))]
+    public long SubDepartmentId { get; set; }
+    public virtual SubDepartment SubDepartment { get; set; }
+    
     [Column("published_date")]
     public DateTime PublishedDate { get; set; }
     

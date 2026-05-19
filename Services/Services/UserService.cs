@@ -35,6 +35,7 @@ public class UserService : IUserService
             DepartmentId = model.DepartmentId,
             IsSigned = false,
             LastLoginDate = DateTime.Now,
+            SubDepartmentId = model.SubDepartmentId,
         };
         
         var createdUser= await _userRepository.AddAsync(user);
@@ -47,6 +48,7 @@ public class UserService : IUserService
             Role = createdUser.Role,
             DepartmentId = createdUser.DepartmentId,
             LastLoginDate = createdUser.LastLoginDate,
+            SubDepartmentId = createdUser.SubDepartmentId,
         };
         return userGetViewModel;
     }
@@ -61,6 +63,7 @@ public class UserService : IUserService
         user.Login = model.Login;
         user.Role = model.Role;
         user.DepartmentId = model.DepartmentId;
+        user.SubDepartmentId = model.SubDepartmentId;
         
         var updatedUser=await _userRepository.UpdateAsync(user);
         
@@ -73,6 +76,7 @@ public class UserService : IUserService
             Role = updatedUser.Role,
             DepartmentId = updatedUser.DepartmentId,
             LastLoginDate = updatedUser.LastLoginDate,
+            SubDepartmentId = updatedUser.SubDepartmentId,
         };
         return userGetViewModel;
     }
@@ -106,6 +110,7 @@ public class UserService : IUserService
             Role = user.Role,
             DepartmentId = user.DepartmentId,
             IsSigned = user.IsSigned,
+            SubDepartmentId = user.SubDepartmentId,
         };
         return viewModel;
     }
@@ -126,7 +131,8 @@ public class UserService : IUserService
             Role = user.Role,
             DepartmentId = user.DepartmentId,
             LastLoginDate = user.LastLoginDate, 
-            IsSigned = user.IsSigned
+            IsSigned = user.IsSigned,
+            SubDepartmentId = user.SubDepartmentId,
         };
         return userGetViewModel;
     }
@@ -145,7 +151,8 @@ public class UserService : IUserService
             Role = user.Role,
             DepartmentId = user.DepartmentId,
             LastLoginDate = user.LastLoginDate,
-            IsSigned = user.IsSigned
+            IsSigned = user.IsSigned,
+            SubDepartmentId = user.SubDepartmentId,
         };
         return userGetViewModel;
     }
@@ -166,7 +173,8 @@ public class UserService : IUserService
                 Role = user.Role,
                 DepartmentId = user.DepartmentId,
                 LastLoginDate = user.LastLoginDate,
-                IsSigned = user.IsSigned
+                IsSigned = user.IsSigned,
+                SubDepartmentId = user.SubDepartmentId,
             });
         }
         return userViewModels;
@@ -188,7 +196,8 @@ public class UserService : IUserService
                 Role = user.Role,
                 DepartmentId = user.DepartmentId,
                 LastLoginDate = user.LastLoginDate,
-                IsSigned = user.IsSigned
+                IsSigned = user.IsSigned,
+                SubDepartmentId = user.SubDepartmentId,
             });
         }
         return userViewModels;    

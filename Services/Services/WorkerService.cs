@@ -5,16 +5,17 @@ using DataAccess.Repositories.WorkerRepositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Services.Interfaces;
+using Services.Tools;
 using Services.ViewModels.WorkerViewModels;
 
 namespace Services.Services;
 [Injectable]
 public class WorkerService : IWorkerService
 {
-    private readonly IExcelReaderService _excelReaderService;
+    private readonly IExcelService _excelReaderService;
     private IWorkerRepository _workerRepository { get; set; }
 
-    public WorkerService(IWorkerRepository workerRepository, IExcelReaderService excelReaderService)
+    public WorkerService(IWorkerRepository workerRepository, IExcelService excelReaderService)
     {
         _workerRepository = workerRepository;
         _excelReaderService = excelReaderService;
@@ -26,7 +27,7 @@ public class WorkerService : IWorkerService
         {
             DepartmentId = model.DepartmentId,
             PersonnelNumber = model.PersonnelNumber,
-            FullName = model.FullName,
+            FullName = CyrillicToLatinConverter.Convert(model.FullName),
             Position = model.Position,
         };
         

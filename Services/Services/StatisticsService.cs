@@ -2,7 +2,9 @@ using Core.Attributes;
 using DataAccess.Entities;
 using DataAccess.Enums;
 using DataAccess.Repositories.JobRepositories;
+using Microsoft.EntityFrameworkCore;
 using Services.Interfaces;
+using Services.ViewModels.JobViewModels;
 using Services.ViewModels.StatisticsViewModel;
 
 namespace Services.Services;
@@ -10,10 +12,11 @@ namespace Services.Services;
 public class StatisticsService : IStatisticsService
 {
     private readonly IJobRepository _jobRepository;
-
-    public StatisticsService(IJobRepository jobRepository)
+    private readonly IExcelService _exceService;
+    public StatisticsService(IJobRepository jobRepository, IExcelService exceService)
     {
         _jobRepository = jobRepository;
+        _exceService = exceService;
     }
 
     public async Task<GetStatisticsViewModel> GetDepartmentStatisticsByDateRange(
@@ -87,4 +90,42 @@ public class StatisticsService : IStatisticsService
 
         return parts.Any() ? string.Join(" ", parts) : "1 daqiqadan kam";
     }
+    
+    public async Task<List<JobGetViewModel>> GetJobsStatisticsByDepartmentId(long departmentId,DateTime fromDate, DateTime toDate)
+    {
+        var jobs=await _jobRepository.GetAllAsQueryable().
+            Where(j => j.DepartmentId == departmentId && 
+                       j.PublishedDate.Date>=fromDate.Date && j.PublishedDate.Date<=toDate.Date)
+            .ToListAsync();
+        var jobGetViewModels=new List<JobGetViewModel>();
+        
+        foreach (Job job in jobs)
+        {
+            jobGetViewModels.Add(new  JobGetViewModel()
+            {
+                Id = job.Id,
+                Title = job.Title,
+                Description = job.Description,
+                JobStatus = job.JobStatus,
+                PublisherId = job.PublisherId,
+                DepartmentId = job.DepartmentId,
+                MobilizedWorkers = job.MobilizedWorkers,
+                PublishedDate = job.PublishedDate,
+                StartedDate = job.StartedDate,
+                EndDate = job.EndDate,
+                DepartmentName = job.Department.DepartmentFullName,
+                PublisherName = job.Publisher.FirstName + " " + job.Publisher.LastName,
+                SubDepartmentId = job.SubDepartmentId,
+            });
+        }
+        return jobGetViewModels;
+    }
+    
+    public async Task<byte[]> ExportStatisticsAsync(long departmentId, DateTime fromDate, DateTime toDate)
+    {
+        var jobs = await GetJobsStatisticsByDepartmentId(departmentId, fromDate, toDate);
+        var departmentName = jobs.FirstOrDefault()?.DepartmentName ?? "";
+        return _exceService.Export(jobs, departmentName, fromDate, toDate);
+    }
+    
 }

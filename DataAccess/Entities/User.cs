@@ -4,6 +4,7 @@ using System.Data;
 using DataAccess.Enums;
 
 namespace DataAccess.Entities;
+
 [Table("users")]
 public class User : BaseEntity<long>
 {
@@ -25,10 +26,16 @@ public class User : BaseEntity<long>
     
     [Column("role")] 
     public UserRole Role { get; set; }
+    
     [Column("department_id"),ForeignKey(nameof(Department))] public long DepartmentId { get; set; }
     public virtual Department Department { get; set; }
+    
+    [Column("sub_department_id"),ForeignKey(nameof(SubDepartment))] public long SubDepartmentId { get; set; }
+    public virtual SubDepartment SubDepartment { get; set; }
+    
     [Column("is_signed")]
     public bool IsSigned { get; set; }
+    
     [Column("last_login_date")]
     public DateTime LastLoginDate { get; set; }
 }
